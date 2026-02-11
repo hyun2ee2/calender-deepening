@@ -61,8 +61,9 @@ public class Calender {
     }
 
     // 행위 메서드
-    public void updateCalender(String title, String content) {
+    public void update(String title, String content) {
         this.title = title;
         this.content = content;
+        this.createdAt = LocalDateTime.now();
     }
 }
