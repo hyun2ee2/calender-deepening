@@ -36,6 +36,10 @@ public class User {
     @Size(min = 1, max = 100)
     @NotBlank
     private String email;
+
+    // 사용자 패스워드
+    @Column(nullable = false)
+    private String password;
     
     // 사용자 생성일
     @CreatedDate
@@ -48,14 +52,16 @@ public class User {
     private LocalDateTime updatedAt;
 
     // 생성자
-    public User(String author, String email) {
+    public User(String author, String email, String password) {
         this.author = author;
         this.email = email;
+        this.password = password;
     }
 
     // 행위 메서드
     public void updateProfile(String author, String email) {
         this.author = author;
         this.email = email;
+        this.createdAt = LocalDateTime.now();
     }
 }
