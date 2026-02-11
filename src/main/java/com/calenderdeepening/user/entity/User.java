@@ -39,13 +39,13 @@ public class User {
     
     // 사용자 생성일
     @CreatedDate
-    @Column(name = "created_user", updatable = false, nullable = false)
-    private LocalDateTime createdUser;
+    @Column(name = "created_at", updatable = false, nullable = false)
+    private LocalDateTime createdAt;
     
     // 사용자 수정일
     @LastModifiedDate
     @Column(name = "updated_at")
-    private LocalDateTime updatedUser;
+    private LocalDateTime updatedAt;
 
     // 생성자
     public User(String author, String email) {
