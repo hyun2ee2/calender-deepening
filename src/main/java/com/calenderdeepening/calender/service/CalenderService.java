@@ -21,7 +21,7 @@ public class CalenderService {
 
     // 생성
     @Transactional
-    public CreateCalenderResponse save(Long userId, CreateCalenderRequset request) {
+    public CreateCalenderResponse save(Long userId, CreateCalenderRequest request) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new IllegalStateException("존재하지 않는 유저입니다.")
         );
@@ -73,8 +73,8 @@ public class CalenderService {
     // 삭제
     @Transactional
     public void delete(Long calenderId) {
-        boolean exitence = calenderRepository.existsById(calenderId);
-        if(!exitence) {
+        boolean existence = calenderRepository.existsById(calenderId);
+        if(!existence) {
             throw new IllegalStateException("존재하지 않는 일정입니다.");
         }
         calenderRepository.deleteById(calenderId);
