@@ -1,12 +1,12 @@
 package com.calenderdeepening.calender.entity;
 
+import com.calenderdeepening.user.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.apache.catalina.User;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Table(name = "calender")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-public class CalenderEntity {
+public class Calender {
 
     // 사용자 ID
     @Id
@@ -30,12 +30,6 @@ public class CalenderEntity {
     // optional과 nullable은 항상 짝이 맞아야하기 때문에 둘다 false(optional은 JPA에서 null의 허용 여부 nullable은 DB에서 null의 허용 여부)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    // 작성자명(1~10사이의 텍스트 길이)
-    @Column(length = 10, nullable = false)
-    @Size(min = 1, max = 10)
-    @NotBlank
-    private String author;
 
     // 일정 제목(1~30사이의 텍스트 길이)
     @Column(length = 30, nullable = false)
@@ -59,4 +53,16 @@ public class CalenderEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    // 생성자
+    public Calender(String title, String content, User user) {
+        this.title = title;
+        this.content = content;
+        this.user = user;
+    }
+
+    // 행위 메서드
+    public void updateCalender(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
 }
