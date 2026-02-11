@@ -1,4 +1,4 @@
 package com.calenderdeepening.calender.dto;
 
-public class DeleteCalenderRequset {
+public class DeleteCalenderRequest {
 }
