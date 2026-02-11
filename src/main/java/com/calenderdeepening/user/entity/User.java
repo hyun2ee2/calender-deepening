@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -16,7 +17,8 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserEntity {
+@EntityListeners(AuditingEntityListener.class)
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +32,7 @@ public class UserEntity {
     
     // 사용자 이메일
     @Email(message = "이메일 형식이 올바르지 않습니다.")
-    @Column(length = 100, nullable = false)
+    @Column(length = 100, nullable = false, unique = true)
     @Size(min = 1, max = 100)
     @NotBlank
     private String email;
@@ -46,7 +48,7 @@ public class UserEntity {
     private LocalDateTime updatedUser;
 
     // 생성자
-    public UserEntity(String author, String email) {
+    public User(String author, String email) {
         this.author = author;
         this.email = email;
     }
