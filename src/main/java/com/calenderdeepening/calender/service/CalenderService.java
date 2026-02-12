@@ -23,7 +23,7 @@ public class CalenderService {
     @Transactional
     public CreateCalenderResponse save(Long userId, CreateCalenderRequest request) {
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new IllegalStateException("존재하지 않는 유저입니다.")
+                () -> new IllegalStateException("존재하지 않는 사용자입니다.(사용자를 생성해주세요.)")
         );
 
         Calender calender = new Calender(request.getTitle(), request.getContent(), user);
