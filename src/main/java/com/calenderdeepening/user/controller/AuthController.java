@@ -1,5 +1,6 @@
 package com.calenderdeepening.user.controller;
 
+import com.calenderdeepening.config.PasswordEncoder;
 import com.calenderdeepening.user.dto.LoginRequest;
 import com.calenderdeepening.user.entity.User;
 import com.calenderdeepening.user.repository.UserRepository;
@@ -13,9 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class AuthorController {
+public class AuthController {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // 로그인
     @PostMapping("/login")
@@ -27,7 +29,7 @@ public class AuthorController {
                 () -> new IllegalStateException("존재하지 않는 이메일입니다.")
         );
 
-        if (!user.getPassword().equals(request.getPassword())) {
+        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new IllegalStateException("패스워드가 일치하지 않습니다.");
         }
 
