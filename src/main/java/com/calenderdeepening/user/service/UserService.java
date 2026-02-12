@@ -4,8 +4,8 @@ import com.calenderdeepening.config.PasswordEncoder;
 import com.calenderdeepening.user.dto.*;
 import com.calenderdeepening.user.entity.User;
 import com.calenderdeepening.user.repository.UserRepository;
-import jakarta.persistence.Table;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,9 +28,15 @@ public class UserService {
                 request.getEmail(),
                 encodePassword
         );
-        User savedUser = userRepository.save(user);
+        try {
+            User savedUser = userRepository.save(user);
 
-        return new CreateUserResponse(savedUser.getId(),savedUser.getAuthor(), savedUser.getEmail());
+            return new CreateUserResponse(savedUser.getId(), savedUser.getAuthor(), savedUser.getEmail());
+        } catch (
+                DataIntegrityViolationException e) {
+            throw new IllegalStateException("이미 존재하는 사용자입니다.");
+        }
+
     }
 
     // 다 건 조회
@@ -38,7 +44,7 @@ public class UserService {
     public List<GetUsersResponse> getAll() {
         List<User> users = userRepository.findAll();
         List<GetUsersResponse> dtos = new ArrayList<>();
-        for(User user : users) {
+        for (User user : users) {
             GetUsersResponse dto = new GetUsersResponse(
                     user.getId(),
                     user.getAuthor()
@@ -69,7 +75,7 @@ public class UserService {
         );
 
         // 패스워드 검증
-        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new IllegalStateException("패스워드가 일치하지 않습니다.");
         }
         user.updateProfile(request.getAuthor(), request.getEmail());
