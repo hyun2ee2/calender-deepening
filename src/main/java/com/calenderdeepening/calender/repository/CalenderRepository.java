@@ -8,7 +8,6 @@ import java.util.List;
 
 @Repository
 public interface CalenderRepository extends JpaRepository<Calender, Long> {
-    List<Calender> findAllByCalender(Calender calender);
 
     List<Calender> findByUser(User user);
 }
