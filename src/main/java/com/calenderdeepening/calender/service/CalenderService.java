@@ -5,6 +5,7 @@ import com.calenderdeepening.calender.entity.Calender;
 import com.calenderdeepening.calender.repository.CalenderRepository;
 import com.calenderdeepening.user.entity.User;
 import com.calenderdeepening.user.repository.UserRepository;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,10 +22,8 @@ public class CalenderService {
 
     // 생성
     @Transactional
-    public CreateCalenderResponse save(Long userId, CreateCalenderRequest request) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new IllegalStateException("존재하지 않는 사용자입니다.(사용자를 생성해주세요.)")
-        );
+    public CreateCalenderResponse save(HttpSession session, CreateCalenderRequest request) {
+        User user = getLoginUser(session);
 
         Calender calender = new Calender(request.getTitle(), request.getContent(), user);
         Calender savedCalender = calenderRepository.save(calender);
@@ -37,8 +36,9 @@ public class CalenderService {
 
     // 다 건 조회
     @Transactional(readOnly = true)
-    public List<GetCalenderResponse> getAll(Long userId) {
-        return calenderRepository.findByUserId(userId)
+    public List<GetCalenderResponse> getAll(HttpSession session) {
+        User user = getLoginUser(session);
+        return calenderRepository.findByUserId(user.getId())
                 .stream()
                 .map(calender -> new GetCalenderResponse(
                         calender.getId(),
@@ -50,16 +50,18 @@ public class CalenderService {
 
     // 단 건 조회
     @Transactional(readOnly = true)
-    public GetCalenderResponse getOne(Long userId, Long calenderId) {
-        Calender calender = calenderRepository.findByIdAndUserId(userId, calenderId)
+    public GetCalenderResponse getOne(HttpSession session, Long calenderId) {
+        User user = getLoginUser(session);
+        Calender calender = calenderRepository.findByIdAndUserId(user.getId(), calenderId)
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 일정이거나 일정을 조회할 권한이 없습니다."));
         return new GetCalenderResponse(calender.getId(), calender.getTitle(), calender.getContent());
     }
 
     // 수정
     @Transactional
-    public UpdateCalenderResponse update(Long userId, Long calenderId, UpdateCalenderRequest request) {
-        Calender calender = calenderRepository.findByIdAndUserId(userId, calenderId).orElseThrow(
+    public UpdateCalenderResponse update(HttpSession session, Long calenderId, UpdateCalenderRequest request) {
+        User user = getLoginUser(session);
+        Calender calender = calenderRepository.findByIdAndUserId(user.getId(), calenderId).orElseThrow(
                 () -> new IllegalStateException("존재하지 않는 일정이거나 일정을 수정할 권한이 없습니다.")
         );
         calender.update(request.getTitle(), request.getContent());
@@ -68,13 +70,24 @@ public class CalenderService {
 
     // 삭제
     @Transactional
-    public void delete(Long userId, Long calenderId) {
-        Calender calender = calenderRepository.findByIdAndUserId(userId, calenderId).orElseThrow(
+    public void delete(HttpSession session, Long calenderId) {
+        User user = getLoginUser(session);
+
+        calenderRepository.findByIdAndUserId(calenderId, user.getId()).orElseThrow(
                 () -> new IllegalStateException("존재하지 않는 일정이거나 일정을 삭제할 권한이 없습니다.")
         );
 
         calenderRepository.deleteById(calenderId);
     }
 
+    private User getLoginUser(HttpSession session) {
+        Long loginUserId = (Long) session.getAttribute("LOGIN_USER");
+        if (loginUserId == null) {
+            throw new IllegalStateException("로그인이 필요한 서비스입니다.");
+        }
 
+        return userRepository.findById(loginUserId).orElseThrow(
+                () -> new IllegalStateException("존재하지 않는 유저입니다.")
+        );
+    }
 }
