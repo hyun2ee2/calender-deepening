@@ -27,19 +27,20 @@ public class CommentController {
     }
 
     // 다 건 조회
-    @GetMapping("/calenders/{calenderId}/comments")
+    @GetMapping("/calenders/comments")
     public ResponseEntity<List<GetCommentResponse>> getComments(
-            @PathVariable Long calenderId
+            HttpSession session
     ) {
-        return ResponseEntity.status(HttpStatus.OK).body(commentService.getAll(calenderId));
+        return ResponseEntity.ok(commentService.getAll(session));
     }
 
     // 단 건 조회
     @GetMapping("/calenders/{calenderId}/comments/{commentId}")
     public ResponseEntity<GetCommentResponse> getComment(
+            HttpSession session,
             @PathVariable Long commentId
     ) {
-        return ResponseEntity.status(HttpStatus.OK).body(commentService.getOne(commentId));
+        return ResponseEntity.ok(commentService.getOne(session, commentId));
     }
 
     // 수정
@@ -49,7 +50,7 @@ public class CommentController {
             @RequestBody UpdateCommentRequest request,
             HttpSession session
     ) {
-        return ResponseEntity.status(HttpStatus.OK).body(commentService.update(commentId, request, session));
+        return ResponseEntity.ok(commentService.update(commentId, request, session));
     }
 
     @DeleteMapping("/calenders/{calenderId}/comments/{commentId}")
@@ -58,7 +59,6 @@ public class CommentController {
             HttpSession session
     ) {
         commentService.delete(commentId, session);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.noContent().build();
     }
-
 }

@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/{calenders}")
+@RequestMapping("/calenders")
 public class CalenderController {
 
     private final CalenderService calenderService;
@@ -24,9 +24,7 @@ public class CalenderController {
             @RequestBody CreateCalenderRequest request,
             HttpSession session
     ) {
-        Long usersId = getLoginUser(session);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(calenderService.save(usersId, request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(calenderService.save(session, request));
     }
 
     // 다 건 GET
@@ -34,8 +32,7 @@ public class CalenderController {
     public ResponseEntity<List<GetCalenderResponse>> getCalenders(
             HttpSession session
     ) {
-        Long usersId = getLoginUser(session);
-        return ResponseEntity.status(HttpStatus.OK).body(calenderService.getAll(usersId));
+        return ResponseEntity.status(HttpStatus.OK).body(calenderService.getAll(session));
     }
 
     // 단 건 GET
@@ -44,8 +41,7 @@ public class CalenderController {
             @PathVariable Long calenderId,
             HttpSession session
     ) {
-        Long userId = getLoginUser(session);
-        return ResponseEntity.status(HttpStatus.OK).body((calenderService.getOne(userId, calenderId)));
+        return ResponseEntity.status(HttpStatus.OK).body((calenderService.getOne(session, calenderId)));
     }
 
     // PUT
@@ -55,8 +51,7 @@ public class CalenderController {
             @RequestBody UpdateCalenderRequest request,
             HttpSession session
     ) {
-        Long usersId = getLoginUser(session);
-        return ResponseEntity.status(HttpStatus.OK).body(calenderService.update(usersId, calenderId, request));
+        return ResponseEntity.status(HttpStatus.OK).body(calenderService.update(session, calenderId, request));
     }
 
     // DELETE
@@ -65,18 +60,7 @@ public class CalenderController {
             @PathVariable Long calenderId,
             HttpSession session
     ) {
-        Long usersId = getLoginUser(session);
-        calenderService.delete(usersId, calenderId);
+        calenderService.delete(session, calenderId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
-
-    // 로그인 체크 메서드
-    private Long getLoginUser(HttpSession session) {
-        Long userId = (Long) session.getAttribute("LOGIN_USER");
-
-        if(userId == null) {
-            throw new IllegalStateException("로그인이 필요한 서비스입니다.");
-        }
-        return userId;
     }
 }
