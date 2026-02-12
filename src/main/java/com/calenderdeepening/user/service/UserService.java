@@ -1,5 +1,6 @@
 package com.calenderdeepening.user.service;
 
+import com.calenderdeepening.config.PasswordEncoder;
 import com.calenderdeepening.user.dto.*;
 import com.calenderdeepening.user.entity.User;
 import com.calenderdeepening.user.repository.UserRepository;
@@ -15,17 +16,21 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // 추가
     @Transactional
     public CreateUserResponse save(CreateUserRequest request) {
-        User user = new User(request.getAuthor(), request.getEmail(), request.getPassword());
-        User savedUser = userRepository.save(user);
-        return new CreateUserResponse(
-                savedUser.getId(),
-                savedUser.getEmail(),
-                savedUser.getPassword()
+        String encodePassword = passwordEncoder.encode(request.getPassword());
+
+        User user = new User(
+                request.getAuthor(),
+                request.getEmail(),
+                encodePassword
         );
+        User savedUser = userRepository.save(user);
+
+        return new CreateUserResponse(savedUser.getId(),savedUser.getAuthor(), savedUser.getEmail());
     }
 
     // 다 건 조회
@@ -64,7 +69,7 @@ public class UserService {
         );
 
         // 패스워드 검증
-        if(!user.getPassword().equals(request.getPassword())) {
+        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new IllegalStateException("패스워드가 일치하지 않습니다.");
         }
         user.updateProfile(request.getAuthor(), request.getEmail());
@@ -77,7 +82,7 @@ public class UserService {
                 () -> new IllegalStateException("존재하지 않는 사용자입니다."));
 
         // 패스워드 검증
-        if (!user.getPassword().equals(request.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new IllegalStateException("패스워드가 일치하지 않습니다.");
         }
         userRepository.delete(user);
