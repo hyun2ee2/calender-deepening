@@ -38,12 +38,8 @@ public class CalenderService {
     // 다 건 조회
     @Transactional(readOnly = true)
     public List<GetCalenderResponse> getAll(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new IllegalStateException("존재하지 않는 사용자입니다.")
-        );
-
-        List<Calender> calenders = calenderRepository.findByUser(user);
-        return calenders.stream()
+        return calenderRepository.findByUserId(userId)
+                .stream()
                 .map(calender -> new GetCalenderResponse(
                         calender.getId(),
                         calender.getTitle(),
@@ -54,23 +50,18 @@ public class CalenderService {
 
     // 단 건 조회
     @Transactional(readOnly = true)
-    public GetCalenderResponse getOne(Long calenderId) {
-        Calender calender = calenderRepository.findById(calenderId)
-                .orElseThrow(() -> new IllegalStateException("존재하지 않는 일정입니다."));
+    public GetCalenderResponse getOne(Long userId, Long calenderId) {
+        Calender calender = calenderRepository.findByIdAndUserId(userId, calenderId)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 일정이거나 일정을 조회할 권한이 없습니다."));
         return new GetCalenderResponse(calender.getId(), calender.getTitle(), calender.getContent());
     }
 
     // 수정
     @Transactional
     public UpdateCalenderResponse update(Long userId, Long calenderId, UpdateCalenderRequest request) {
-        Calender calender = calenderRepository.findById(calenderId).orElseThrow(
-                () -> new IllegalStateException("존재하지 않는 일정입니다.")
+        Calender calender = calenderRepository.findByIdAndUserId(userId, calenderId).orElseThrow(
+                () -> new IllegalStateException("존재하지 않는 일정이거나 일정을 수정할 권한이 없습니다.")
         );
-
-        // 인가된 사용자인지 검증
-        if(!calender.getUser().getId().equals(userId)) {
-            throw new IllegalStateException("일정을 수정할 권한이 없습니다.");
-        }
         calender.update(request.getTitle(), request.getContent());
         return new UpdateCalenderResponse(calender.getId(), calender.getTitle(), calender.getContent());
     }
@@ -78,14 +69,10 @@ public class CalenderService {
     // 삭제
     @Transactional
     public void delete(Long userId, Long calenderId) {
-        Calender calender = calenderRepository.findById(calenderId).orElseThrow(
-                () -> new IllegalStateException("존재하지 않는 일정입니다.")
+        Calender calender = calenderRepository.findByIdAndUserId(userId, calenderId).orElseThrow(
+                () -> new IllegalStateException("존재하지 않는 일정이거나 일정을 삭제할 권한이 없습니다.")
         );
 
-        // 인가된 사용자인지 검증
-        if(!calender.getUser().getId().equals(userId)) {
-            throw new IllegalStateException("일정을 삭제할 권한이 없습니다.");
-        }
         calenderRepository.deleteById(calenderId);
     }
 
