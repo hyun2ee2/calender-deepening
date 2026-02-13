@@ -11,6 +11,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+
 import java.time.LocalDateTime;
 
 @Getter
@@ -30,22 +31,24 @@ public class User {
     @NotBlank
     private String author;
     
-    // 사용자 이메일
+    // 사용자 이메일(1~100글자 사이의 텍스트 길이)
     @Email(message = "이메일 형식이 올바르지 않습니다.")
     @Column(length = 100, nullable = false, unique = true)
     @Size(min = 1, max = 100)
     @NotBlank
     private String email;
 
-    // 사용자 패스워드
-    @Column(nullable = false)
+    // 사용자 패스워드(8~100글자 사이의 텍스트 길이)
+    @Column(length = 100, nullable = false)
+    @Size(min = 8, max = 100)
+    @NotBlank
     private String password;
     
     // 사용자 생성일
     @CreatedDate
     @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt;
-    
+
     // 사용자 수정일
     @LastModifiedDate
     @Column(name = "updated_at")
@@ -62,6 +65,5 @@ public class User {
     public void updateProfile(String author, String email) {
         this.author = author;
         this.email = email;
-        this.createdAt = LocalDateTime.now();
     }
 }
