@@ -1,7 +1,7 @@
 # 프로젝트 정보
 
 - 개발기간: 2026.02.10 ~ 2026.02.12
-- 리팩토링 목적: 기존에 있던 캘린더 프로젝트를 
+- 리팩토링 목적: 기존에 있던 캘린더 프로젝트를 숙련 Spring에서 배운것을 활용하여 개선하게 되었습니다.
 
 ---
 
@@ -15,10 +15,10 @@
 - 암호화 학습
 
 ## API 명세서
-[API명세서 바로가기]()
+[API명세서 바로가기](https://documenter.getpostman.com/view/34034548/2sBXcBmh47)
 
 ## ERD
 <img src="img/erd.png">
 
 ## TIL & 트러블 슈팅
-[티스토리 바로가기]()
+[티스토리 바로가기](https://hyunspaceworkshop.tistory.com/20)
